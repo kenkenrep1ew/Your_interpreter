@@ -24,27 +24,35 @@
   </tbody>
 </table>
 
-<h2>音声認識</h2>
-<button id="btn">start</button>
-<div id="content"></div>
+
+<button id="speech_btn">SPEECH</button>
+
+  <div id="speech_out">
+    <p>TEST HERE</p>
+</div>
 
 <script>
-  const speech = new webkitSpeechRecognition();
-  speech.lang = 'th-TH';
+var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
 
-  const btn = document.getElementById('btn');
-  const content = document.getElementById('content');
+var speech = new SpeechRecognition();
+speech.lang = "ja-JP";
 
-  btn.addEventListener('click', function() {
-    speech.start();
-  })
+document.querySelector("#speech_btn").addEventListener("click", function(e){
+  speech.start();
+});
 
-  speech.addEventListener('result', function(e) {
-    console.log(e);
+speech.onresult = function(e){
+  speech.stop();
+  console.log(e.results);
 
-    const text = e.results[0][0].transcript;
-    content.innerText = text;
-  });
+  document.querySelector("#speech_out").innerHTML += "<p>You speak: " + e.results[0][0].transcript + "</p>";
+
+};
+
+speech.onend = () => {
+  console.log("Speech Recognition is end.");
+  speech.start();
+}
 
 </script>
 
