@@ -4,6 +4,19 @@ class UsersController < ApplicationController
   # GET /users or /users.json
   def index
     @users = User.all
+
+    bae_uri = "https://chatapp-1cc84-default-rtdb.firebaseio.com"
+    private_key_json_string = File.open(Rails.root.to_s + '/firebase_key.json').read
+
+    puts private_key_json_string
+    firebase = Firebase::Client.new(base_uri, private_key_json_string)
+
+    response = firebase.push("room1", {
+                  :name => 'Pick the milk',
+                  :a_text => "Yay this is From Rails"
+                })
+    
+    # response.success?
   end
 
   # GET /users/1 or /users/1.json
