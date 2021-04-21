@@ -5,7 +5,7 @@ class UsersController < ApplicationController
   def index
     @users = User.all
 
-    bae_uri = "https://chatapp-1cc84-default-rtdb.firebaseio.com"
+    base_uri = "https://chatapp-1cc84-default-rtdb.firebaseio.com"
     private_key_json_string = File.open(Rails.root.to_s + '/firebase_key.json').read
 
     puts private_key_json_string
