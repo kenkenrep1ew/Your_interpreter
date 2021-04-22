@@ -1,4 +1,6 @@
 <script src="https://cdn.webrtc.ecl.ntt.com/skyway-1.1.18.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
 <p id="notice"><%= notice %></p>
 
 <h1>Users</h1>
@@ -39,13 +41,15 @@
 </div>
 <br>
 <video id="my-video" width="400px" autoplay muted playsinline></video>
-<p id="my-id"></p>
-<textarea id="their-id"></textarea>
-<button id="make-call">発信</button>
-<video id="their-video" width="400px" autoplay muted playsinline></video>
-   
-<hr>
 <div id="output"></div>
+<p id="my-id"></p>
+<hr>
+<input type="text" id="their-id">
+<button id="make-call">発信</button>
+<video id="their-video" width="400px" autoplay muted playsinline style="border:solid 1px"></video>
+   
+
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 
@@ -91,10 +95,12 @@ newPostRef.ref(room).on("child_added", function(data){
     const k = data.key;
     let str = "";
 
-    str += '<div class="name">' + v.username + '</div>';
-    str += '<div class="r_text">' + v.a_text + '</div>';
-
-    output.innerHTML = str;
+    // str += 'Name:' + v.username + '  Says:' + v.a_text + ' Translated:' + v.translation;
+    str += 'Name:' + v.username + '  Says:' + v.a_text;
+    // if (v.username === username){
+      output.innerHTML = str;
+    // }
+    
 });
 
 // SpeechRecognition
@@ -109,13 +115,33 @@ document.querySelector("#speech_btn").addEventListener("click", function(e){
 
 speech.onresult = function(e){
   speech.stop();
-  console.log(e.results);
+  console.log(e.results[0][0].transcript);
   // Here !!!
+  q = "q="+e.results[0][0].transcript;
+  sourceData = q + "&target=en&key=AIzaSyCvYIoj74wELbE6TaMYRsDRrA4SLpre6ko";
+  var responseText = "";
+  $.ajax({
+		url:"https://translation.googleapis.com/language/translate/v2",
+		type:"POST",
+		data:sourceData,
+		dataType:"json",
+		timespan:1000 
+  }).done(function(data,textStatus){
+    // console.log(textStatus);
+    // console.log(data.data.translations[0].translatedText);
+    responseText = data.data.translations[0].translatedText;
+  }).fail(function(textStatus){
+    console.log(textStatus);
+  }).always(function(){
+    console.log("Done Ajax");
+  });
+  console.log(responseText);
   newPostRef.ref(room).push({
           username: username.value,
-          a_text: e.results[0][0].transcript
+          a_text: e.results[0][0].transcript,
+          // translation: 
       });
-      a_text.value = "";
+      // a_text.value = "";
   // document.querySelector("#speech_out").innerHTML += "<p>You speak: " + e.results[0][0].transcript + "</p>";
 
 };
